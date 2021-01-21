@@ -1,5 +1,5 @@
 # USAGE
-# python gradient_descent.py
+# python sgd.py
 
 # import the necessary packages
 from sklearn.model_selection import train_test_split
@@ -19,9 +19,6 @@ def sigmoid_deriv(x):
     # compute the derivative of the sigmoid function ASSUMING
     # that the input `x` has already been passed through the sigmoid
     # activation function
-    # 실제 sigmoid 의 도함수는 sigmoid(x)*(1 - sigmoid(x))
-    #  그러나 이미 sigmoid 함수를 위에서 통과했다고
-    # 가정하기 때문에 sigmoid 호출은 빠져있다.
     return x * (1 - x)
 
 
@@ -32,10 +29,17 @@ def predict(X, W):
     # apply a step function to threshold the outputs to binary
     # class labels
     preds[preds <= 0.5] = 0
-    preds[preds > 0.5] = 1
+    preds[preds > 0] = 1
 
     # return the predictions
     return preds
+
+
+def next_batch(X, y, batchSize):
+    # loop over our dataset `X` in mini-batches, yielding a tuple of
+    # the current batched data and labels
+    for i in np.arange(0, X.shape[0], batchSize):
+        yield (X[i:i + batchSize], y[i:i + batchSize])
 
 
 # construct the argument parse and parse the arguments
@@ -44,6 +48,8 @@ ap.add_argument("-e", "--epochs", type=float, default=100,
                 help="# of epochs")
 ap.add_argument("-a", "--alpha", type=float, default=0.01,
                 help="learning rate")
+ap.add_argument("-b", "--batch-size", type=int, default=32,
+                help="size of SGD mini-batches")
 args = vars(ap.parse_args())
 
 # generate a 2-class classification problem with 1,000 data points,
@@ -69,31 +75,38 @@ losses = []
 
 # loop over the desired number of epochs
 for epoch in np.arange(0, args["epochs"]):
-    # take the dot product between our features `X` and the weight
-    # matrix `W`, then pass this value through our sigmoid activation
-    # function, thereby giving us our predictions on the dataset
-    preds = sigmoid_activation(trainX.dot(W))
+    # initialize the total loss for the epoch
+    epochLoss = []
 
-    # now that we have our predictions, we need to determine the
-    # `error`, which is the difference between our predictions and
-    # the true values
-    error = preds - trainY
-    loss = np.sum(error ** 2)
+    # loop over our data in batches
+    for (batchX, batchY) in next_batch(trainX, trainY, args["batch_size"]):
+        # take the dot product between our current batch of features
+        # and the weight matrix, then pass this value through our
+        # activation function
+        preds = sigmoid_activation(batchX.dot(W))
+
+        # now that we have our predictions, we need to determine the
+        # `error`, which is the difference between our predictions
+        # and the true values
+        error = preds - batchY
+        epochLoss.append(np.sum(error ** 2))
+
+        # the gradient descent update is the dot product between our
+        # (1) current batch and (2) the error of the sigmoid
+        # derivative of our predictions
+        d = error * sigmoid_deriv(preds)
+        gradient = batchX.T.dot(d)
+
+        # in the update stage, all we need to do is "nudge" the
+        # weight matrix in the negative direction of the gradient
+        # (hence the term "gradient descent" by taking a small step
+        # towards a set of "more optimal" parameters
+        W += -args["alpha"] * gradient
+
+    # update our loss history by taking the average loss across all
+    # batches
+    loss = np.average(epochLoss)
     losses.append(loss)
-
-    # the gradient descent update is the dot product between our
-    # (1) features and (2) the error of the sigmoid derivative of
-    # our predictions
-    # https://bskyvision.com/411
-    # 편미분한 결과에 의한 공식인듯
-    d = error * sigmoid_deriv(preds)
-    gradient = trainX.T.dot(d)
-
-    # in the update stage, all we need to do is "nudge" the weight
-    # matrix in the negative direction of the gradient (hence the
-    # term "gradient descent" by taking a small step towards a set
-    # of "more optimal" parameters
-    W += -args["alpha"] * gradient
 
     # check to see if an update should be displayed
     if epoch == 0 or (epoch + 1) % 5 == 0:
