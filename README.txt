@@ -18,3 +18,10 @@
     - pip install scipy matplotlib pillow
     - pip install imutils h5py requests progressbar2
     - pip install scikit-learn scikit-image
+
+    - pip install graphviz
+    - pip install pydot
+
+# 유용한 팁
+* Ctrl + Shift + N (파일찾기)
+* Back, Forward 단축키 정리 (https://cupjoo.tistory.com/94)
