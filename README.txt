@@ -8,7 +8,9 @@
 
 # 딥러닝 환경설정
 * https://developer.nvidia.com/rdp/cudnn-archive 에서 자신의 CUDA 버전에 맞는 cuDNN 다운로드
+    - 현재 tensorflow 2.X 기준으로 CUDA 10.1 까지만 공식지원
 * CUDA가 설치된 폴더에 붙여넣기
+* Pycharm 사용시 tensorflow.keras intelisense 가 안된다면 Community 2020.3 버전을 사용 (Community 버전 기준)
 * 필요 패키지
     - pip install numpy
     - pip install opencv-contrib-python
