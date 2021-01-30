@@ -1,2 +1,5 @@
 # ignore all files in the .idea/ directory
 .idea/*
+/src/03_practitioner_bundle/03_feature_extraction/hdf5/animals/features.hdf5
+/src/03_practitioner_bundle/03_feature_extraction/hdf5/caltech-101/features.hdf5
+/src/03_practitioner_bundle/03_feature_extraction/hdf5/flowers17/features.hdf5
