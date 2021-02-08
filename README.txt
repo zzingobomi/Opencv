@@ -31,3 +31,7 @@
 * fit_generator 사용시 2.1.0 에서는 'error finalizing GeneratorDataset iterator' 발생
   conda install -c conda-forge hdf5=1.10.5
 * os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+# 참고 사이트
+* https://github.com/tensorflow/models/tree/master/research/object_detection
+* https://github.com/kjw0612/awesome-deep-vision/blob/master/README.md
